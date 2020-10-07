@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" href="matrixIcon.ico" type="image/x-icon" />
+  <meta charset="utf-8">
+  <title>Matrizes</title>
+  <script src="mathbox-bundle.js"></script>
+  <script src="katex.min.js"></script>
+  <script src="katex.js"></script>
+  <script src="dat.gui.js"></script>
+  <script src="parser.js"></script>
+  <link rel="stylesheet" href="style.css">
+  
+  
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+<style>
+a {
+	text-decoration: none;
+}
+a:hover {
+    border-bottom: 1px dotted #fff;
+}
+h1 {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fff;
+    text-align: center;
+}
+h3 {
+    font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+    color: #fff026;
+    text-align: center;
+    font-weight: bold;
+}
+h4 {
+    font-family: Calibri;
+    color: #fff;
+    text-align: center;
+}
+
+.main-cont {
+	margin: 0 auto;
+	border: 0px solid #fff;
+	background-color: transparent;
+	padding-top: 20px;
+	padding-left: 50px;
+	height: 850px;
+	width: 640px;
+}
+.container {
+	border: 1px solid #000000;
+	width: 570px;
+	float: left;
+	margin-top: 40px;
+	margin-left: 500px;
+	float: left;
+}
+.container1 {
+	border: 1px solid #000000;
+	width: 500px;
+	margin-top: 40px;
+	margin-left: 250px;
+	margin-right: 50px;
+	text-align:center;
+	float:left;
+}
+
+.container2 {
+	border: 1px solid #000000;
+	width: 500px;
+	margin-top: 40px;
+	margin-bottom: 20px;
+	text-align:center;
+	float:left;
+}	
+	
+.nav-container {
+    width: 640px;
+    margin: 0 auto;
+    background-color: red;
+}
+.nav-active {
+    color: #1A25FF;
+    border: 1px solid #800080;
+    width: 70px;
+    height: 30px;
+    padding-top: 10px;
+    padding-left: 40px;
+    margin-left: 720px;
+    margin-right: 10px;
+}
+.nav {
+    color: #353535;
+    border: 1px solid #000000;
+    width: 70px;
+    height: 30px;
+    padding-top: 10px;
+    padding-left: 10px;
+    margin-right: 10px;
+    margin-left: 10px;
+    
+}
+.input-ans {
+    margin: 20px;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #000000;
+	color: red;
+	background: transparent;
+	font-size: 20px;
+	font-weight: bold;
+	width: 100px;
+	text-align: center;
+}
+.button-ans {
+	width: 100px;
+	height: 30px;
+	margin: 20px;
+	cursor: pointer;
+	background: transparent;
+	border: 1px dashed #000000;
+}
+.button-ans:hover {
+	border: 1px dotted #000000;
+}
+.input-que {
+	height: 30px;
+	width:80px;
+	margin-left: 15px;
+	font-size:20px;
+	text-align:center;
+	font-weight: bold;
+	border: 1px solid #000000;
+	color: #191970;
+}
+</style>
+
+<script type="text/javascript">
+
+function initArray(rows, cols)  {
+    var result = [];
+
+    for (var r = 0; r < rows; r++)  {
+        result[r] = [];
+
+        for (var c = 0; c < cols; c++) result[r][c] = 0;
+    }
+    return result;
+}
+
+function getCofactor(mat, temp, p, q, n){ 
+    var i = 0, j = 0;
+    for (var row = 0; row < n; row++) { 
+        for (var col = 0; col < n; col++) { 
+            if (row != p && col != q) { 
+                temp[i][j++] = mat[row][col]; 
+                if (j === n - 1) { 
+                    j = 0; 
+                    i++; 
+                }
+            }
+        }
+    }
+} 
+
+function determinantOfMatrix(mat, n) {
+	var N = 4;
+    var D = 0; 
+    if (n == 1) return mat[0][0]; 
+    var temp = initArray(N,N);
+    var sign = 1;
+    for (var f = 0; f < n; f++) { 
+        getCofactor(mat, temp, 0, f, n); 
+        D += sign * mat[0][f] * determinantOfMatrix(temp, n - 1); 
+        sign = -sign; 
+    }
+    return D; 
+}
+
+
+function calDet(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16) {
+	return determinantOfMatrix([[n1,n2,n3,n4],[n5,n6,n7,n8],[n9,n10,n11,n12],[n13,n14,n15,n16]], 4);
+}
+
+
+function calMatrix(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16) {
+	matrix.cal.value = determinantOfMatrix([[n1,n2,n3,n4],[n5,n6,n7,n8],[n9,n10,n11,n12],[n13,n14,n15,n16]], 4);
+}
+
+function randomRangeA(min, max) {
+    matrix1.a.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.b.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.c.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.d.value = ~~(Math.random() * (max - min + 1)) + min;
+	matrix1.e.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.f.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.g.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.h.value = ~~(Math.random() * (max - min + 1)) + min;
+	matrix1.i.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.j.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.k.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.l.value = ~~(Math.random() * (max - min + 1)) + min;
+	matrix1.m.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.n.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.o.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix1.p.value = ~~(Math.random() * (max - min + 1)) + min;
+  }
+
+  function randomRangeB(min, max) {
+    matrix2.a.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.b.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.c.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.d.value = ~~(Math.random() * (max - min + 1)) + min;
+	matrix2.e.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.f.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.g.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.h.value = ~~(Math.random() * (max - min + 1)) + min;
+	matrix2.i.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.j.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.k.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.l.value = ~~(Math.random() * (max - min + 1)) + min;
+	matrix2.m.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.n.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.o.value = ~~(Math.random() * (max - min + 1)) + min;
+    matrix2.p.value = ~~(Math.random() * (max - min + 1)) + min;
+  }
+  
+function calTranspose(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16) {
+
+    matrix.ta.value = parseFloat(n1);
+    matrix.tb.value = parseFloat(n5);
+    matrix.tc.value = parseFloat(n9);
+    matrix.td.value = parseFloat(n13);
+	matrix.te.value = parseFloat(n2);
+    matrix.tf.value = parseFloat(n6);
+    matrix.tg.value = parseFloat(n10);
+    matrix.th.value = parseFloat(n14);
+	matrix.ti.value = parseFloat(n3);
+    matrix.tj.value = parseFloat(n7);
+    matrix.tk.value = parseFloat(n11);
+    matrix.tl.value = parseFloat(n15);
+	matrix.tm.value = parseFloat(n4);
+    matrix.tn.value = parseFloat(n8);
+    matrix.to.value = parseFloat(n12);
+    matrix.tp.value = parseFloat(n16);
+}
+
+function calAddiction(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32) {
+    matrix.ta.value = parseFloat(n1)+parseFloat(n17);
+    matrix.tb.value = parseFloat(n2)+parseFloat(n18);
+    matrix.tc.value = parseFloat(n3)+parseFloat(n19);
+    matrix.td.value = parseFloat(n4)+parseFloat(n20);
+	matrix.te.value = parseFloat(n5)+parseFloat(n21);
+    matrix.tf.value = parseFloat(n6)+parseFloat(n22);
+    matrix.tg.value = parseFloat(n7)+parseFloat(n23);
+    matrix.th.value = parseFloat(n8)+parseFloat(n24);
+	matrix.ti.value = parseFloat(n9)+parseFloat(n25);
+    matrix.tj.value = parseFloat(n10)+parseFloat(n26);
+    matrix.tk.value = parseFloat(n11)+parseFloat(n27);
+    matrix.tl.value = parseFloat(n12)+parseFloat(n28);
+	matrix.tm.value = parseFloat(n13)+parseFloat(n29);
+    matrix.tn.value = parseFloat(n14)+parseFloat(n30);
+    matrix.to.value = parseFloat(n15)+parseFloat(n31);
+    matrix.tp.value = parseFloat(n16)+parseFloat(n32);
+}
+
+function calSub(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32) {
+    matrix.ta.value = parseFloat(n1)-parseFloat(n17);
+    matrix.tb.value = parseFloat(n2)-parseFloat(n18);
+    matrix.tc.value = parseFloat(n3)-parseFloat(n19);
+    matrix.td.value = parseFloat(n4)-parseFloat(n20);
+	matrix.te.value = parseFloat(n5)-parseFloat(n21);
+    matrix.tf.value = parseFloat(n6)-parseFloat(n22);
+    matrix.tg.value = parseFloat(n7)-parseFloat(n23);
+    matrix.th.value = parseFloat(n8)-parseFloat(n24);
+	matrix.ti.value = parseFloat(n9)-parseFloat(n25);
+    matrix.tj.value = parseFloat(n10)-parseFloat(n26);
+    matrix.tk.value = parseFloat(n11)-parseFloat(n27);
+    matrix.tl.value = parseFloat(n12)-parseFloat(n28);
+	matrix.tm.value = parseFloat(n13)-parseFloat(n29);
+    matrix.tn.value = parseFloat(n14)-parseFloat(n30);
+    matrix.to.value = parseFloat(n15)-parseFloat(n31);
+    matrix.tp.value = parseFloat(n16)-parseFloat(n32);
+}
+
+function calMult(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32) {
+    matrix.ta.value = (parseFloat(n1)*parseFloat(n17)) + (parseFloat(n2)*parseFloat(n21)) + (parseFloat(n3)*parseFloat(n25)) + (parseFloat(n4)*parseFloat(n29));
+    matrix.tb.value = (parseFloat(n1)*parseFloat(n18)) + (parseFloat(n2)*parseFloat(n22)) + (parseFloat(n3)*parseFloat(n26)) + (parseFloat(n4)*parseFloat(n30));
+    matrix.tc.value = (parseFloat(n1)*parseFloat(n19)) + (parseFloat(n2)*parseFloat(n23)) + (parseFloat(n3)*parseFloat(n27)) + (parseFloat(n4)*parseFloat(n31));
+    matrix.td.value = (parseFloat(n1)*parseFloat(n20)) + (parseFloat(n2)*parseFloat(n24)) + (parseFloat(n3)*parseFloat(n28)) + (parseFloat(n4)*parseFloat(n32));
+	matrix.te.value = (parseFloat(n5)*parseFloat(n17)) + (parseFloat(n6)*parseFloat(n21)) + (parseFloat(n7)*parseFloat(n25)) + (parseFloat(n8)*parseFloat(n29));
+    matrix.tf.value = (parseFloat(n5)*parseFloat(n18)) + (parseFloat(n6)*parseFloat(n22)) + (parseFloat(n7)*parseFloat(n26)) + (parseFloat(n8)*parseFloat(n30));
+    matrix.tg.value = (parseFloat(n5)*parseFloat(n19)) + (parseFloat(n6)*parseFloat(n23)) + (parseFloat(n7)*parseFloat(n27)) + (parseFloat(n8)*parseFloat(n31));
+    matrix.th.value = (parseFloat(n5)*parseFloat(n20)) + (parseFloat(n6)*parseFloat(n24)) + (parseFloat(n7)*parseFloat(n28)) + (parseFloat(n8)*parseFloat(n32));
+	matrix.ti.value = (parseFloat(n9)*parseFloat(n17)) + (parseFloat(n10)*parseFloat(n21)) + (parseFloat(n11)*parseFloat(n25)) + (parseFloat(n12)*parseFloat(n29));
+    matrix.tj.value = (parseFloat(n9)*parseFloat(n18)) + (parseFloat(n10)*parseFloat(n22)) + (parseFloat(n11)*parseFloat(n26)) + (parseFloat(n12)*parseFloat(n30));
+    matrix.tk.value = (parseFloat(n9)*parseFloat(n19)) + (parseFloat(n10)*parseFloat(n23)) + (parseFloat(n11)*parseFloat(n27)) + (parseFloat(n12)*parseFloat(n31));
+    matrix.tl.value = (parseFloat(n9)*parseFloat(n20)) + (parseFloat(n10)*parseFloat(n24)) + (parseFloat(n11)*parseFloat(n28)) + (parseFloat(n12)*parseFloat(n32));
+	matrix.tm.value = (parseFloat(n13)*parseFloat(n17)) + (parseFloat(n14)*parseFloat(n21)) + (parseFloat(n15)*parseFloat(n25)) + (parseFloat(n16)*parseFloat(n29));
+    matrix.tn.value = (parseFloat(n13)*parseFloat(n18)) + (parseFloat(n14)*parseFloat(n22)) + (parseFloat(n15)*parseFloat(n26)) + (parseFloat(n16)*parseFloat(n30));
+    matrix.to.value = (parseFloat(n13)*parseFloat(n19)) + (parseFloat(n14)*parseFloat(n23)) + (parseFloat(n15)*parseFloat(n27)) + (parseFloat(n16)*parseFloat(n31));
+    matrix.tp.value = (parseFloat(n13)*parseFloat(n20)) + (parseFloat(n14)*parseFloat(n24)) + (parseFloat(n15)*parseFloat(n28)) + (parseFloat(n16)*parseFloat(n32));
+}
+
+function matrix_invert(M){
+	
+    if(M.length !== M[0].length){return;}
+    var i=0, ii=0, j=0, dim=M.length, e=0, t=0;
+    var I = [], C = [];
+    for(i=0; i<dim; i+=1){
+        I[I.length]=[];
+        C[C.length]=[];
+        for(j=0; j<dim; j+=1){
+
+            if(i==j){ I[i][j] = 1; }
+            else{ I[i][j] = 0; }
+
+            C[i][j] = M[i][j];
+        }
+    }
+    
+    for(i=0; i<dim; i+=1){
+        e = C[i][i];
+
+        if(e==0){
+            for(ii=i+1; ii<dim; ii+=1){
+                if(C[ii][i] != 0){
+                    for(j=0; j<dim; j++){
+                        e = C[i][j];       //temp store i'th row
+                        C[i][j] = C[ii][j];//replace i'th row by ii'th
+                        C[ii][j] = e;      //repace ii'th by temp
+                        e = I[i][j];       //temp store i'th row
+                        I[i][j] = I[ii][j];//replace i'th row by ii'th
+                        I[ii][j] = e;      //repace ii'th by temp
+                    }
+                    break;
+                }
+            }
+            e = C[i][i];
+            if(e==0){return}
+        }
+
+        for(j=0; j<dim; j++){
+            C[i][j] = C[i][j]/e; //apply to original matrix
+            I[i][j] = I[i][j]/e; //apply to identity
+        }
+        for(ii=0; ii<dim; ii++){
+            // Only apply to other rows (we want a 1 on the diagonal)
+            if(ii==i){continue;}
+            e = C[ii][i];
+            for(j=0; j<dim; j++){
+                C[ii][j] -= e*C[i][j]; //apply to original matrix
+                I[ii][j] -= e*I[i][j]; //apply to identity
+            }
+        }
+    }
+    return I;
+}
+
+
+function calAdjoint(n1,n2,n3,n4) {
+    matrix.ta.value = parseFloat(n4);
+    matrix.tb.value = parseFloat(-n2);
+    matrix.tc.value = parseFloat(-n3);
+    matrix.td.value = parseFloat(n1);
+}
+function calInverse(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16) {
+	if(calDet(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16)==0)
+	{
+		alert("O determinante é 0, portanto a matriz não é invertível!");
+	}
+	else
+		 var x = matrix_invert([[n1,n2,n3,n4],[n5,n6,n7,n8],[n9,n10,n11,n12],[n13,n14,n15,n16]]);
+		matrix.ta.value = x[0][0];
+		matrix.tb.value = x[0][1]; 
+		matrix.tc.value = x[0][2]; 
+		matrix.td.value = x[0][3]; 
+		matrix.te.value = x[1][0]; 
+		matrix.tf.value = x[1][1]; 
+		matrix.tg.value = x[1][2];
+		matrix.th.value = x[1][3];
+		matrix.ti.value = x[2][0];
+		matrix.tj.value = x[2][1];
+		matrix.tk.value = x[2][2];
+		matrix.tl.value = x[2][3];
+		matrix.tm.value = x[3][0];
+		matrix.tn.value = x[3][1];
+		matrix.to.value = x[3][2];
+		matrix.tp.value = x[3][3];
+}
+
+function calClear(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13) {
+
+    matrix.ta.value = 0;
+    matrix.tb.value = 0;
+    matrix.tc.value = 0;
+    matrix.td.value = 0;
+	matrix.te.value = 0;
+    matrix.tf.value = 0;
+    matrix.tg.value = 0;
+    matrix.th.value = 0;
+	matrix.ti.value = 0;
+    matrix.tj.value = 0;
+    matrix.tk.value = 0;
+    matrix.tl.value = 0;
+	matrix.tm.value = 0;
+    matrix.tn.value = 0;
+    matrix.to.value = 0;
+    matrix.tp.value = 0;
+    matrix1.a.value = 0;
+    matrix1.b.value = 0;
+    matrix1.c.value = 0;
+    matrix1.d.value = 0;
+    matrix1.e.value = 0;
+    matrix1.f.value = 0;
+    matrix1.g.value = 0;
+    matrix1.h.value = 0;
+	matrix1.i.value = 0;
+    matrix1.j.value = 0;
+    matrix1.k.value = 0;
+    matrix1.l.value = 0;
+    matrix1.m.value = 0;
+    matrix1.n.value = 0;
+    matrix1.o.value = 0;
+    matrix1.p.value = 0;
+	matrix2.a.value = 0;
+    matrix2.b.value = 0;
+    matrix2.c.value = 0;
+    matrix2.d.value = 0;
+    matrix2.e.value = 0;
+    matrix2.f.value = 0;
+    matrix2.g.value = 0;
+    matrix2.h.value = 0;
+	matrix2.i.value = 0;
+    matrix2.j.value = 0;
+    matrix2.k.value = 0;
+    matrix2.l.value = 0;
+    matrix2.m.value = 0;
+    matrix2.n.value = 0;
+    matrix2.o.value = 0;
+    matrix2.p.value = 0;
+	matrix.cal.value = 0;
+}
+
+function matrixAddition(a, b) {
+  "use strict";
+  var res = [];
+  a.forEach((t, n) => {
+    res.push(t.reduce((sums, val, i) => sums.concat(val + b[n][i]), []));
+  });
+  alert(res);
+  return res;
+}
+</script>
+  </head>
+
+<body style="background-color:#ffe4c4">
+
+
+<div>
+	<div class="nav-active">
+	<a href="matrizes.html">2 X 2</a></div>
+	<div class="nav-active">
+	<a href="3x3.html">3 X 3</a></div>
+		<div class="nav-active">
+	<a href="4x4.html">4 X 4</a></div>
+	<input type="button" value="Limpar campos" style="height:30px; background-color:magenta; color:white; font-size:14px; font-weight:bold" onClick="calClear(matrix.ta.value,matrix.tb.value,matrix.tc.value,matrix.td.value,matrix1.a.value,matrix1.b.value,matrix1.c.value,matrix1.d.value,matrix2.e.value,matrix2.f.value,matrix2.g.value,matrix2.h.value,)">
+	
+</div>
+<br><br>
+
+<div class="container1" style="font-size:22px; font-weight:bold">Matriz A
+<form name="matrix1">
+<table border="0" cellspacing="20">
+	<tr>
+		<td><input type="text" name="a" value="0" class="input-que"></td>
+		<td><input type="text" name="b" value="0" class="input-que"></td>
+		<td><input type="text" name="c" value="0" class="input-que"></td>
+		<td><input type="text" name="d" value="0" class="input-que"></td>
+	</tr>	
+	<tr>
+		<td><input type="text" name="e" value="0" class="input-que"></td>
+		<td><input type="text" name="f" value="0" class="input-que"></td>
+		<td><input type="text" name="g" value="0" class="input-que"></td>
+		<td><input type="text" name="h" value="0" class="input-que"></td>
+	</tr>
+		<tr>
+		<td><input type="text" name="i" value="0" class="input-que"></td>
+		<td><input type="text" name="j" value="0" class="input-que"></td>
+		<td><input type="text" name="k" value="0" class="input-que"></td>
+		<td><input type="text" name="l" value="0" class="input-que"></td>
+	</tr>
+		<tr>
+		<td><input type="text" name="m" value="0" class="input-que"></td>
+		<td><input type="text" name="n" value="0" class="input-que"></td>
+		<td><input type="text" name="o" value="0" class="input-que"></td>
+		<td><input type="text" name="p" value="0" class="input-que"></td>
+	</tr>	
+</table>
+<input type="button" value="Gerar A aleatória" style="height:20px; background-color:brown; color:white; font-size:12px; font-weight:bold" onClick="randomRangeA(-100, 100)">
+</form>
+</div>
+
+
+<div class="container2" style="font-size:22px; font-weight:bold">
+<form name="matrix2">Matriz B
+<table border="0" cellspacing="20">
+	<tr>
+		<td><input type="text" name="a" value="0" class="input-que"></td>
+		<td><input type="text" name="b" value="0" class="input-que"></td>
+		<td><input type="text" name="c" value="0" class="input-que"></td>
+		<td><input type="text" name="d" value="0" class="input-que"></td>
+	</tr>	
+	<tr>
+		<td><input type="text" name="e" value="0" class="input-que"></td>
+		<td><input type="text" name="f" value="0" class="input-que"></td>
+		<td><input type="text" name="g" value="0" class="input-que"></td>
+		<td><input type="text" name="h" value="0" class="input-que"></td>
+	</tr>
+		<tr>
+		<td><input type="text" name="i" value="0" class="input-que"></td>
+		<td><input type="text" name="j" value="0" class="input-que"></td>
+		<td><input type="text" name="k" value="0" class="input-que"></td>
+		<td><input type="text" name="l" value="0" class="input-que"></td>
+	</tr>
+		<tr>
+		<td><input type="text" name="m" value="0" class="input-que"></td>
+		<td><input type="text" name="n" value="0" class="input-que"></td>
+		<td><input type="text" name="o" value="0" class="input-que"></td>
+		<td><input type="text" name="p" value="0" class="input-que"></td>
+	</tr>
+</table>
+<input type="button" value="Gerar B aleatória" style="height:20px; background-color:brown; color:white; font-size:12px; font-weight:bold" onClick="randomRangeB(-100, 100)">
+</form>
+</div>
+	
+<div style="float:left;margin-left:80px;">
+<br><br>
+
+<button type="button" style="height:50px; background-color:blue; color:white; font-size:18px; font-weight:bold" onClick="calAddiction(matrix1.a.value,matrix1.b.value,matrix1.c.value,matrix1.d.value,matrix1.e.value,matrix1.f.value,matrix1.g.value,matrix1.h.value,matrix1.i.value,matrix1.j.value,matrix1.k.value,matrix1.l.value,matrix1.m.value,matrix1.n.value,matrix1.o.value,matrix1.p.value,matrix2.a.value,matrix2.b.value,matrix2.c.value,matrix2.d.value,matrix2.e.value,matrix2.f.value,matrix2.g.value,matrix2.h.value,matrix2.i.value,matrix2.j.value,matrix2.k.value,matrix2.l.value,matrix2.m.value,matrix2.n.value,matrix2.o.value,matrix2.p.value)">Somar (A+B)</button>
+<button type="button" style="height:50px; background-color:blue; color:white; font-size:18px; font-weight:bold" onClick="calSub(matrix1.a.value,matrix1.b.value,matrix1.c.value,matrix1.d.value,matrix1.e.value,matrix1.f.value,matrix1.g.value,matrix1.h.value,matrix1.i.value,matrix1.j.value,matrix1.k.value,matrix1.l.value,matrix1.m.value,matrix1.n.value,matrix1.o.value,matrix1.p.value,matrix2.a.value,matrix2.b.value,matrix2.c.value,matrix2.d.value,matrix2.e.value,matrix2.f.value,matrix2.g.value,matrix2.h.value,matrix2.i.value,matrix2.j.value,matrix2.k.value,matrix2.l.value,matrix2.m.value,matrix2.n.value,matrix2.o.value,matrix2.p.value)">Subtrair (A-B)</button>
+<button type="button" style="height:50px; background-color:blue; color:white; font-size:18px; font-weight:bold" onClick="calMult(matrix1.a.value,matrix1.b.value,matrix1.c.value,matrix1.d.value,matrix1.e.value,matrix1.f.value,matrix1.g.value,matrix1.h.value,matrix1.i.value,matrix1.j.value,matrix1.k.value,matrix1.l.value,matrix1.m.value,matrix1.n.value,matrix1.o.value,matrix1.p.value,matrix2.a.value,matrix2.b.value,matrix2.c.value,matrix2.d.value,matrix2.e.value,matrix2.f.value,matrix2.g.value,matrix2.h.value,matrix2.i.value,matrix2.j.value,matrix2.k.value,matrix2.l.value,matrix2.m.value,matrix2.n.value,matrix2.o.value,matrix2.p.value)">Multiplicar (AxB)</button>
+<button type="button" style="height:50px; background-color:blue; color:white; font-size:18px; font-weight:bold" onClick="calMatrix(matrix1.a.value,matrix1.b.value,matrix1.c.value,matrix1.d.value,matrix1.e.value,matrix1.f.value,matrix1.g.value,matrix1.h.value,matrix1.i.value,matrix1.j.value,matrix1.k.value,matrix1.l.value,matrix1.m.value,matrix1.n.value,matrix1.o.value,matrix1.p.value)">Determinante de A</button>
+<button type="button" style="height:50px; background-color:blue; color:white; font-size:18px; font-weight:bold" onClick="calMatrix(matrix2.a.value,matrix2.b.value,matrix2.c.value,matrix2.d.value,matrix2.e.value,matrix2.f.value,matrix2.g.value,matrix2.h.value,matrix2.i.value,matrix2.j.value,matrix2.k.value,matrix2.l.value,matrix2.m.value,matrix2.n.value,matrix2.o.value,matrix2.p.value)">Determinante de B</button>
+<input type="button" value="Transposta de A" style="height:50px; background-color:blue; color:white; font-size:18px; font-weight:bold" onClick="calTranspose(matrix1.a.value,matrix1.b.value,matrix1.c.value,matrix1.d.value,matrix1.e.value,matrix1.f.value,matrix1.g.value,matrix1.h.value,matrix1.i.value,matrix1.j.value,matrix1.k.value,matrix1.l.value,matrix1.m.value,matrix1.n.value,matrix1.o.value,matrix1.p.value)">
+<input type="button" value="Transposta de B" style="height:50px; background-color:blue; color:white; font-size:18px; font-weight:bold" onClick="calTranspose(matrix2.a.value,matrix2.b.value,matrix2.c.value,matrix2.d.value,matrix2.e.value,matrix2.f.value,matrix2.g.value,matrix2.h.value,matrix2.i.value,matrix2.j.value,matrix2.k.value,matrix2.l.value,matrix2.m.value,matrix2.n.value,matrix2.o.value,matrix2.p.value)">
+<input type="button" value="Inversa de A" style="height:50px; background-color:blue; color:white; font-size:18px; font-weight:bold" onClick="calInverse(matrix1.a.value,matrix1.b.value,matrix1.c.value,matrix1.d.value,matrix1.e.value,matrix1.f.value,matrix1.g.value,matrix1.h.value,matrix1.i.value,matrix1.j.value,matrix1.k.value,matrix1.l.value,matrix1.m.value,matrix1.n.value,matrix1.o.value,matrix1.p.value)">
+<input type="button" value="Inversa de B" style="height:50px; background-color:blue; color:white; font-size:18px; font-weight:bold" onClick="calInverse(matrix2.a.value,matrix2.b.value,matrix2.c.value,matrix2.d.value,matrix2.e.value,matrix2.f.value,matrix2.g.value,matrix2.h.value,matrix2.i.value,matrix2.j.value,matrix2.k.value,matrix2.l.value,matrix2.m.value,matrix2.n.value,matrix2.o.value,matrix2.p.value)">
+</div>
+
+
+<div class="container" style="font-size:22px; font-weight:bold; text-align:center">Resultado
+<form name="matrix">
+
+	<table>
+	<tr>
+		<td><input type="text" name="ta" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="tb" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="tc" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="td" value="0" class="input-ans" disabled></td>
+	</tr>	
+	<tr>
+		<td><input type="text" name="te" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="tf" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="tg" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="th" value="0" class="input-ans" disabled></td>
+	</tr>
+		<tr>
+		<td><input type="text" name="ti" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="tj" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="tk" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="tl" value="0" class="input-ans" disabled></td>
+	</tr>	
+	<tr>
+		<td><input type="text" name="tm" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="tn" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="to" value="0" class="input-ans" disabled></td>
+		<td><input type="text" name="tp" value="0" class="input-ans" disabled></td>
+	</tr>
+	<tr>
+		<td style="font-weight:bold;font-size:18px;">Determinante:</td>
+
+		<td><input type="text" name="cal" value="0" class="input-ans" disabled></td>
+	</tr>	
+</table>
+</form>	
+</div>
+
+</div>
+</table>	
+</form>
+	</body>
+</html>

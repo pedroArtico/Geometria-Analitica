@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" href="geometric.ico" type="image/x-icon" />
+  <meta charset="utf-8">
+  <title>Cônicas</title>
+  <script src="mathbox-bundle.js"></script>
+  <script src="katex.min.js"></script>
+  <script src="katex.js"></script>
+  <script src="dat.gui.js"></script>
+  <script src="parser.js"></script>
+  <link rel="stylesheet" href="style.css">
+  
+  <style rel="text/css">
+  span.property-name{
+  background-color: #ffe4c4;
+  width:100%;
+  color: blue;
+  font-size: 1.1em;
+  height: 25px;
+  font-family:Arial;
+}
+
+li.cr.function
+{
+  background-color: #ffe4c4;
+}
+
+.dg .cr.function:hover, .dg .cr.boolean:hover {
+  background-color: #ffe4c4;
+}
+
+.dg li.title
+{
+	background-color: #ff7f50;
+	color:#000000;
+}
+
+.dg.main .close-button {
+	background-color: #673ab7;
+}
+
+.dg.main .close-button:hover {
+    background-color: #673ab7;
+}
+
+.dg .c input[type=text] {
+	background: #00ff00;
+}
+
+.dg .c .slider-fg {
+    background: #ff1493;
+}
+
+.dg .c input[type=text]:hover {
+    background: #ffd700;
+}
+
+.dg li:not {
+  background-color: #ffe4c4;
+}
+
+
+</style>
+  
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+</head>
+<body>
+
+  <script>
+    var mathbox = mathBox({
+      plugins: ['core', 'controls', 'cursor', 'mathbox'],
+      controls: {klass: THREE.OrbitControls}
+    });
+    if (mathbox.fallback) throw "WebGL not supported"
+
+    var three = mathbox.three;
+    three.renderer.setClearColor(new THREE.Color(0xECFFF5), 1.0);
+
+	var graphData, view;
+	
+	var functionText = "";
+	var a = 1.0, b = 1.0, c = 1.0;
+	var	xMin = -4, xMax = 4, yMin = -2,	yMax = 2;
+	
+	// start of updateGraph function ==============================================================
+	var updateGraphFunc = function() 
+	{ 
+		var sides = functionText.split("=");
+		var LHS = sides[0];
+		var RHS = sides[1];
+		var LHSfunc = Parser.parse( LHS ).toJSFunction( ['x','y'] );
+		var RHSfunc = Parser.parse( RHS ).toJSFunction( ['x','y'] );
+		var zFunc = function(x,y) { return LHSfunc(x,y) - RHSfunc(x,y); }
+		// var zFunc = Parser.parse( functionText ).toJSFunction( ['x','y'] ); // split, subtract.
+		
+		vertexArray = [];
+		edgeArray = [];
+		
+		vertexArray = marchingSquares( xMin, xMax, yMin, yMax, zFunc, 0, 128 );
+		
+		for (var n = 0; n < vertexArray.length; n += 2)
+		{
+			edgeArray.push( vertexArray[n], vertexArray[n+1] );
+		}
+		edgeData.set( "width", edgeArray.length/2 );
+		edgeData.set( "data", edgeArray );
+
+		view.set("range", [[xMin, xMax], [yMin, yMax]]);
+	}
+	
+	// end of updateGraph function ==============================================================
+	
+	var updateGraph = function() { updateGraphFunc(); };
+	
+	var camera = mathbox.camera( { proxy: false, position: [0,0,3] } );
+
+	 // save as variable to adjust later
+    view = mathbox.cartesian(
+	  {
+        range: [[xMin, xMax], [yMin, yMax]],
+        scale: [2,1],
+      }
+	);
+
+	// axes
+	var xAxis = view.axis( {axis: 1, width: 10, detail: 40, color:"red"} );
+    var xScale = view.scale( {axis: 1, divide: 5, nice:true, zero:true} );
+    var xTicks = view.ticks( {width: 8, size: 18, color: "red", zBias:2} );
+    var xFormat = view.format( {digits: 2, font:"Arial", weight: "bold", style: "normal", source: xScale} );
+    var xTicksLabel = view.label( {color: "red", zIndex: 0, offset:[0,-20], points: xScale, text: xFormat} );
+	
+	var yAxis = view.axis( {axis: 2, width: 10, detail: 40, color:"green"} );
+    var yScale = view.scale( {axis: 2, divide: 5, nice:true, zero:false} );
+    var yTicks = view.ticks( {width: 8, size: 18, color: "green", zBias:2} );
+    var yFormat = view.format( {digits: 2, font:"Arial", weight: "bold", style: "normal", source: yScale} );
+    var yTicksLabel = view.label( {color: "green", zIndex: 0, offset:[0,-20], points: yScale, text: yFormat} );
+
+	
+	var quadriculado = function()
+	{
+		delete view.grid()
+		view.grid( {axes:[1,2], width: 3, divideX: 20, divideY: 20, opacity:1.0} )
+	}
+	
+	
+	// discrete graph
+	var vertexArray = [];
+	var edgeArray = [];
+	
+	// draw the links
+    var edgeData = view.array({
+		width: edgeArray.length/2,
+		items: 2,    // two vertices per segment...
+		channels: 3, // graphed in 3D
+		data: edgeArray,
+    });
+	
+	var edgeView = view.vector({
+		points: edgeData, 
+		color:"#440088", width:4, start:false
+	});
+	
+	// returns an array of endpoints of edges. c = zLevel, i.e. isocline value.
+	// z = zFunc(x,y). generating the level set where z = c.
+	function marchingSquares(xMin, xMax, yMin, yMax, zFunc, c, resolution)
+	{
+		var xStep = (xMax - xMin) / resolution;
+		var yStep = (yMax - yMin) / resolution;
+		var points = [];
+		for (var x = xMin; x < xMax; x += xStep)
+		{
+			for (var y = yMin; y < yMax; y += yStep)
+			{
+				var z1 = zFunc(x,y);				// bottom left corner
+				var z2 = zFunc(x+xStep, y);			// bottom right corner
+				var z4 = zFunc(x+xStep, y+yStep);	// top right corner
+				var z8 = zFunc(x, y+yStep);			// top left corner
+				var n = 0;
+				if (z1 > c) n += 1;
+				if (z2 > c) n += 2;
+				if (z4 > c) n += 4;
+				if (z8 > c) n += 8;
+				
+				// calculate linear interpolation values along the given sides.
+				//  to simplify, could assume each is 0.5*xStep or 0.5*yStep accordingly.
+				var bottomInterp 	= (c - z1) / (z2 - z1) * xStep;
+				var topInterp 		= (c - z8) / (z4 - z8) * xStep;
+				var leftInterp 		= (c - z1) / (z8 - z1) * yStep;
+				var rightInterp 	= (c - z2) / (z4 - z2) * yStep;
+				
+				// for a visual diagram of cases: https://en.wikipedia.org/wiki/Marching_squares
+				if (n == 1 || n == 14) // lower left corner
+					points.push( [x, y+leftInterp, c], [x+bottomInterp, y, c] );
+					
+				else if (n == 2 || n == 13) // lower right corner
+					points.push( [x+bottomInterp, y, c], [x+xStep, y+rightInterp, c] );
+					
+				else if (n == 4 || n == 11) // upper right corner
+					points.push( [x+topInterp, y+yStep, c], [x+xStep, y+rightInterp, c] );
+					
+				else if (n == 8 || n == 7) // upper left corner
+					points.push( [x, y+leftInterp, c], [x+topInterp, y+yStep, c] );
+					
+				else if (n == 3 || n == 12) // horizontal
+					points.push( [x, y+leftInterp, c], [x+xStep, y+rightInterp, c] );
+					
+				else if (n == 6 || n == 9) // vertical
+					points.push( [x+bottomInterp, y, c], [x+topInterp, y+yStep, c] );
+					
+				else if (n == 5) // should do subcase // lower left & upper right
+					points.push( [x, y+leftInterp, c], [x+bottomInterp, y, c], [x+topInterp, y+yStep, c], [x+xStep, y+rightInterp, c] );
+					
+				else if (n == 10) // should do subcase // lower right & upper left
+					points.push( [x+bottomInterp, y, c], [x+xStep, y+rightInterp, c], [x, y+yStep/2, c], [x, y+leftInterp, c], [x+topInterp, y+yStep, c] );
+					
+				else if (n == 0 || n == 15) // no line segments appear in this grid square.
+					points.push();
+				
+			}
+		}
+		return points;
+	
+	}
+
+    // GUI controls
+	
+	var gui = new dat.GUI();
+	
+	gui.add( this, 'functionText' ).name('y = f(x) = ').onFinishChange( updateGraphFunc ).listen();
+	
+	var folder0 = gui.addFolder('Parâmetros');
+	var aGUI = folder0.add( this, 'a' ).min(-3).max(3).step(0.01).name('a = ').onChange( updateGraphFunc );
+	var bGUI = folder0.add( this, 'b' ).min(-3).max(3).step(0.01).name('b = ').onChange( updateGraphFunc );
+	var cGUI = folder0.add( this, 'c' ).min(-3).max(3).step(0.01).name('c = ').onChange( updateGraphFunc );
+	folder0.open();
+	
+	var folderP = gui.addFolder("Equações");
+	folderP.open();
+	
+	var presetFunc1 = function() { functionText = "y = a*x^2 + b*x + c"; aGUI.setValue(1); bGUI.setValue(0); cGUI.setValue(-1); updateGraph(); }
+	var preset1GUI = folderP.add( this, "presetFunc1" ).name("Parábola");
+
+	var presetFunc2 = function() { functionText = "a*x^2 + b*y^2 = c^2"; aGUI.setValue(1); bGUI.setValue(1); cGUI.setValue(1); updateGraph(); }
+	var preset2GUI = folderP.add( this, "presetFunc2" ).name("Circulo");
+
+	var presetFunc3 = function() { functionText = "a*x^2 + b*y^2 = c^2"; aGUI.setValue(1); bGUI.setValue(2); cGUI.setValue(1); updateGraph(); }
+	var preset3GUI = folderP.add( this, "presetFunc3" ).name("Elipse");
+
+	var presetFunc4 = function() { functionText = "a*x^2 + b*y^2 = c^2"; aGUI.setValue(1); bGUI.setValue(-1); cGUI.setValue(1); updateGraph(); }
+	var preset4GUI = folderP.add( this, "presetFunc4" ).name("Hipérbole");
+
+	var presetFunc5 = function() { functionText = "y= a*x + b"; aGUI.setValue(2); bGUI.setValue(1);  cGUI.setValue(0); updateGraph(); }
+	var preset5GUI = folderP.add( this, "presetFunc5" ).name("Reta");
+	
+	
+	var folder1 = gui.addFolder('Configurações');
+	var xMinGUI = folder1.add( this, 'xMin' );
+	var xMaxGUI = folder1.add( this, 'xMax' );
+	var yMinGUI = folder1.add( this, 'yMin' );
+	var yMaxGUI = folder1.add( this, 'yMax' );
+	folder1.close();
+	
+	var folder3 = gui.addFolder('Atualização de Gráfico');
+	folder3.add( this, 'updateGraph' ).name("Atualizar gráfico");
+	
+	
+	var folder2 = gui.addFolder('Quadriculado?');
+	folder2.add( this, 'quadriculado' ).name("Sim");
+
+	folder2.close();
+	gui.open();
+	
+	updateGraphFunc();
+	
+	</script>
+	</body>
+</html>
